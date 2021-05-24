@@ -1,64 +1,63 @@
-import React, { Component } from 'react';
-import './App.css';
-import Navigation from './Components/Navigation/Navigation';
-import Logo from './Components/Logo/Logo';
-import ImageLinkForm from './Components/ImageLinkForm/ImageLinkForm'
-import Signin from './Components/Signin/Signin'
-import Register from './Components/Register/Register'
-import Rank from './Components/Rank/Rank';
-import Particles from 'react-particles-js';
-import FaceRecognition from './Components/FaceRecognition/FaceRecognition';
+import React, { Component } from "react";
+import "./App.css";
+import Navigation from "./Components/Navigation/Navigation";
+import Logo from "./Components/Logo/Logo";
+import ImageLinkForm from "./Components/ImageLinkForm/ImageLinkForm";
+import Signin from "./Components/Signin/Signin";
+import Register from "./Components/Register/Register";
+import Rank from "./Components/Rank/Rank";
+import Particles from "react-particles-js";
+import FaceRecognition from "./Components/FaceRecognition/FaceRecognition";
 
 const particlesOptions = {
-  "particles": {
-    "number": {
-      "value": 160,
-      "density": {
-        "enable": false
-      }
+  particles: {
+    number: {
+      value: 160,
+      density: {
+        enable: false,
+      },
     },
-    "size": {
-      "value": 10,
-      "random": true
+    size: {
+      value: 10,
+      random: true,
     },
-    "move": {
-      "direction": "bottom",
-      "out_mode": "out"
+    move: {
+      direction: "bottom",
+      out_mode: "out",
     },
-    "line_linked": {
-      "enable": false
-    }
+    line_linked: {
+      enable: false,
+    },
   },
-  "interactivity": {
-    "events": {
-      "onclick": {
-        "enable": true,
-        "mode": "remove"
-      }
+  interactivity: {
+    events: {
+      onclick: {
+        enable: true,
+        mode: "remove",
+      },
     },
-    "modes": {
-      "remove": {
-        "particles_nb": 10
-      }
-    }
-  }
-
-}
+    modes: {
+      remove: {
+        particles_nb: 10,
+      },
+    },
+  },
+};
 
 const initialState = {
-  input: '',
-  imageUrl: '',
+  input: "",
+  imageUrl: "",
   box: {},
-  route: 'signin',
+  route: "signin",
   isSignedIn: false,
   user: {
-    id: '',
-    name: '',
-    email: '',
+    id: "",
+    name: "",
+    email: "",
     entries: 0,
-    joined: ''
-  }
-}
+    joined: "",
+  },
+};
 
 class App extends Component {
   constructor() {
@@ -68,102 +67,111 @@ class App extends Component {
 
   loadUser = (data) => {
     this.setState({
-      user:
-      {
+      user: {
         id: data.id,
         name: data.name,
         email: data.email,
         entries: data.entries,
-        joined: data.joined
-      }
-    })
-  }
+        joined: data.joined,
+      },
+    });
+  };
 
   calculateFaceLocation = (data) => {
-    const clarifaiFace = data.outputs[0].data.regions[0].region_info.bounding_box;
-    const image = document.getElementById('inputimage');
+    const clarifaiFace =
+      data.outputs[0].data.regions[0].region_info.bounding_box;
+    const image = document.getElementById("inputimage");
     const width = Number(image.width);
     const height = Number(image.height);
     return {
       leftCol: clarifaiFace.left_col * width,
       topRow: clarifaiFace.top_row * height,
-      rightCol: width - (clarifaiFace.right_col * width),
-      bottomRow: height - (clarifaiFace.bottom_row * height)
-    }
-  }
+      rightCol: width - clarifaiFace.right_col * width,
+      bottomRow: height - clarifaiFace.bottom_row * height,
+    };
+  };
 
   displayFaceBox = (box) => {
     this.setState({ box: box });
-  }
+  };
 
   onInputChange = (event) => {
     this.setState({ input: event.target.value });
-  }
+  };
 
   onPictureSubmit = () => {
     this.setState({ imageUrl: this.state.input });
-    fetch('https://thawing-atoll-72787.herokuapp.com/imageurl', {
-      method: 'post',
-      headers: { 'Content-Type': 'application/json' },
+    fetch("https://thawing-atoll-72787.herokuapp.com/imageurl", {
+      method: "post",
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        input: this.state.input
-      })
+        input: this.state.input,
+      }),
     })
-      .then(response => response.json())
-      .then(response => {
+      .then((response) => response.json())
+      .then((response) => {
         if (response) {
-          fetch('https://thawing-atoll-72787.herokuapp.com/image', {
-            method: 'put',
-            headers: { 'Content-Type': 'application/json' },
+          fetch("https://thawing-atoll-72787.herokuapp.com/image", {
+            method: "put",
+            headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
-              id: this.state.user.id
-            })
+              id: this.state.user.id,
+            }),
           })
-            .then(response => response.json())
-            .then(count => {
-              this.setState(Object.assign(this.state.user, {
-                entries: count
-              }))
+            .then((response) => response.json())
+            .then((count) => {
+              this.setState(
+                Object.assign(this.state.user, {
+                  entries: count,
+                })
+              );
             })
-            .catch(console.log)
+            .catch(console.log);
         }
-        this.displayFaceBox(this.calculateFaceLocation(response))
+        this.displayFaceBox(this.calculateFaceLocation(response));
       })
-      .catch(error => console.log(error));
-  }
+      .catch((error) => console.log(error));
+  };
 
   onRouteChange = (route) => {
-    if (route === 'signout') {
-      this.setState(initialState)
-    } else if (route === 'home') {
-      this.setState({ isSignedIn: true })
+    if (route === "signout") {
+      this.setState(initialState);
+    } else if (route === "home") {
+      this.setState({ isSignedIn: true });
     }
-    this.setState({ route: route })
-  }
+    this.setState({ route: route });
+  };
 
   render() {
     const { isSignedIn, imageUrl, route, box } = this.state;
     return (
       <div className="App">
-        <Particles className='particles'
-          params={particlesOptions} />
-        <Navigation isSignedIn={isSignedIn} onRouteChange={this.onRouteChange} />
-        {route === 'home'
-          ? <div>
+        <Particles className="particles" params={particlesOptions} />
+        <Navigation
+          isSignedIn={isSignedIn}
+          onRouteChange={this.onRouteChange}
+        />
+        {route === "home" ? (
+          <div>
             <Logo />
-            <Rank name={this.state.user.name} entries={this.state.user.entries} />
+            <Rank
+              name={this.state.user.name}
+              entries={this.state.user.entries}
+            />
             <ImageLinkForm
               onInputChange={this.onInputChange}
               onPictureSubmit={this.onPictureSubmit}
             />
             <FaceRecognition box={box} imageUrl={imageUrl} />
           </div>
-          : (
-            route === 'signin'
-              ? <Signin loadUser={this.loadUser} onRouteChange={this.onRouteChange} />
-              : <Register loadUser={this.loadUser} onRouteChange={this.onRouteChange} />
-          )
-        }
+        ) : route === "signin" ? (
+          <Signin loadUser={this.loadUser} onRouteChange={this.onRouteChange} />
+        ) : (
+          <Register
+            loadUser={this.loadUser}
+            onRouteChange={this.onRouteChange}
+          />
+        )}
       </div>
     );
   }
