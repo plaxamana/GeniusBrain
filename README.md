@@ -1,3 +1,5 @@
+[![Netlify Status](https://api.netlify.com/api/v1/badges/b04dd440-6604-4eb6-be24-88e7335ea63e/deploy-status)](https://app.netlify.com/sites/geniusbrain/deploys)
+---
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
 ## Available Scripts
